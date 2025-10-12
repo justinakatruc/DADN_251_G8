@@ -69,7 +69,7 @@ function SignInOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
           </label>
           <div className="w-full bg-gray-100 border-xl border-gray-400 rounded-md my-2">
             <input
-              className="w-full p-2 sm:p-4 text-[#666666] bg-transparent border-none outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
+              className="w-full p-2 sm:p-4 placeholder:text-[#666666] bg-transparent border-none outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
               type="email"
               placeholder="Enter your Email"
             />
@@ -82,7 +82,7 @@ function SignInOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
             </label>
             <div className="w-full bg-gray-100 border-xl border-gray-400 rounded-md my-2">
               <input
-                className="w-full p-2 sm:p-4 text-[#666666] bg-transparent border-none outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
+                className="w-full p-2 sm:p-4 placeholder:text-[#666666] bg-transparent border-none outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
                 type="password"
                 placeholder="Enter your Password"
               />
@@ -104,7 +104,7 @@ function SignInOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
           </button>
           <div className="flex items-center w-full my-2 sm:my-4">
             <div className="flex-grow border-t border-gray-300"></div>
-            <span className="mx-2 sm:mx-3 text-gray-400 text-sm sm:text-base font-medium">
+            <span className="mx-2 sm:mx-3 text-[#666666] text-sm sm:text-base font-medium">
               OR
             </span>
             <div className="flex-grow border-t border-gray-300"></div>
@@ -152,7 +152,7 @@ function SignUpOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
           </label>
           <div className="w-full bg-gray-100 border-xl border-gray-400 rounded-md my-2">
             <input
-              className="w-full p-2 sm:p-4 text-[#666666] bg-transparent border-none outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
+              className="w-full p-2 sm:p-4 placeholder:text-[#666666] bg-transparent border-none outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
               type="email"
               placeholder="Enter your Email"
             />
@@ -165,7 +165,7 @@ function SignUpOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
             </label>
             <div className="w-full bg-gray-100 border-xl border-gray-400 rounded-md my-2">
               <input
-                className="w-full p-2 sm:p-4 text-[#666666] bg-transparent border-none outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
+                className="w-full p-2 sm:p-4 placeholder:text-[#666666] bg-transparent border-none outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
                 type="password"
                 placeholder="Enter your Password"
               />
@@ -177,7 +177,7 @@ function SignUpOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
             </label>
             <div className="w-full bg-gray-100 border-xl border-gray-400 rounded-md my-2">
               <input
-                className="w-full p-2 sm:p-4 text-[#666666] bg-transparent border-none outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
+                className="w-full p-2 sm:p-4 placeholder:text-[#666666] bg-transparent border-none outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
                 type="password"
                 placeholder="Confirm your Password"
               />
@@ -191,7 +191,7 @@ function SignUpOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
           </button>
           <div className="flex items-center w-full my-2 sm:my-4">
             <div className="flex-grow border-t border-gray-300"></div>
-            <span className="mx-2 sm:mx-3 text-gray-400 text-sm sm:text-base font-medium">
+            <span className="mx-2 sm:mx-3 text-[#666666] text-sm sm:text-base font-medium">
               OR
             </span>
             <div className="flex-grow border-t border-gray-300"></div>
@@ -206,7 +206,7 @@ function SignUpOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
               width={24}
               height={24}
             />
-            <span className="px-4">Sign Up with Google</span>
+            <span className="px-4">Login with Google</span>
           </a>
           <div className="flex flex-row justify-center w-full my-4 text-[#262626] text-sm sm:text-base font-medium">
             <p>Already have an account? </p>
