@@ -2,7 +2,7 @@ import AppLayout from "@/app/components/AppLayout"
 import Image from "next/image"
 import TopBar from "@/app/components/TopBar";
 
-export default function Home() {
+export default function HistoryPage() {
   return (
     <AppLayout>
       <div className="p-8 w-full">
