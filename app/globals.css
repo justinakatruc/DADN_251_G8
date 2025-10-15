@@ -42,6 +42,9 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --text-soft: #4D4D4D;
+  --bg-button: #4E7EF9;
+  --bg-button-hover: rgba(78,126,249,0.9);
 }
 
 body {

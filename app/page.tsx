@@ -1,7 +1,8 @@
-import AppLayout from "./components/AppLayout"
+import AppLayout from "@/app/components/AppLayout"
 import Image from "next/image"
-import SensorDisplay from "./components/SensorDisplay";
-import Activity from "./components/Activity";
+import SensorDisplay from "@/app/components/SensorDisplay";
+import Activity from "@/app/components/Activity";
+import TopBar from "@/app/components/TopBar";
 
 export default function Home() {
   return (
@@ -20,6 +21,12 @@ export default function Home() {
               Downloads
             </div>
           </div>
+        </div>
+        <div>
+          <TopBar
+            deviceItems={["All", "Device A", "Device B"]}
+            showAddButton={true}
+          />
         </div>
         <div className="mt-5 w-full grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-[45px] md:gap-y-0">
           <SensorDisplay />

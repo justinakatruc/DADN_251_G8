@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import {
   Select,
   SelectContent,
@@ -61,7 +60,7 @@ export default function Activity() {
                         value={selectedSensor}
                         onValueChange={(value) => setSelectedSensor(value)}
                     >
-                        <SelectTrigger className="w-[100px] xl:w-[140px] cursor-pointer">
+                        <SelectTrigger className="w-[100px] xl:w-[140px] cursor-pointer hover:border-[#CFCFCF]">
                             <SelectValue placeholder="Temperature" />
                         </SelectTrigger>
                         <SelectContent>
@@ -76,7 +75,7 @@ export default function Activity() {
                         value={selectedTime}
                         onValueChange={(value) => setSelectedTime(value)}
                     >
-                        <SelectTrigger className="w-[100px] xl:w-[140px] cursor-pointer">
+                        <SelectTrigger className="w-[100px] xl:w-[140px] cursor-pointer hover:border-[#CFCFCF]">
                             <SelectValue placeholder="Month" />
                         </SelectTrigger>
                         <SelectContent>
