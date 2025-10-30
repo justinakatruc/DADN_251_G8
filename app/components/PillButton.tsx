@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -12,20 +12,31 @@ import {
 interface PillButtonProps {
   label: string;
   items: string[];
+  onChange?: (value: string) => void;   
 }
 
 /**
  * PillButton — Reusable pill-style dropdown button
  * with subtle focus and hover styling.
  */
-export default function PillButton({ label, items }: PillButtonProps) {
+export default function PillButton({ label, items, onChange }: PillButtonProps) {
   const [selected, setSelected] = useState(items[0] || "");
   const hasDropdown = items.length > 1;
 
+  useEffect(() => {
+    setSelected(items[0] || "");
+  }, [items]);
+  
   return (
     <>
       {hasDropdown ? (
-        <Select value={selected} onValueChange={setSelected}>
+        <Select 
+          value={selected} 
+          onValueChange={(v) => {
+            setSelected(v);
+            onChange?.(v);              // <-- phát sự kiện
+          }}
+        >
           <SelectTrigger
             className="
               flex items-center justify-between

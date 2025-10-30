@@ -1,3 +1,5 @@
+"use client"; //thêm để nhận function props/callback từ page.tsx r truyền xuống PillButton
+
 import React from "react";
 import { Calendar, Clock, Plus } from "lucide-react";
 import PillButton from "./PillButton";
@@ -7,6 +9,8 @@ interface TopBarProps {
   deviceItems?: string[];
   rightComponents?: React.ReactNode;
   showAddButton?: boolean;
+  onChangeTimestamp?: (label: string) => void; //callback
+  onChangeDevice?: (value: string) => void; //callback
 }
 
 /**
@@ -18,6 +22,8 @@ export default function TopBar({
   deviceItems,
   rightComponents,
   showAddButton,
+  onChangeTimestamp,
+  onChangeDevice,
 }: TopBarProps) {
   // SSR-safe date/time (runs on server)
   const now = new Date();
@@ -45,11 +51,14 @@ export default function TopBar({
       {/* Right side: Dropdowns and Add button */}
       <div className="flex items-center gap-3">
         {timestampItems && timestampItems.length > 0 && (
-          <PillButton label="Timestamp" items={timestampItems} />
-        )}
+          <PillButton 
+            label="Timestamp" 
+            items={timestampItems}
+            onChange={(v) => onChangeTimestamp?.(v)}/>
+        )} 
 
         {deviceItems && deviceItems.length > 0 && (
-          <PillButton label="Device" items={deviceItems} />
+          <PillButton label="Device" items={deviceItems} onChange={(v) => onChangeDevice?.(v)}/>
         )}
 
         {rightComponents}
