@@ -67,13 +67,13 @@ export const mockDevices = [
 ]
 
 export const baseData: Row[] = [
-    { id: "1",  device: "Device A", sensor: "Temperature", value: 27.6, date: "2025-09-30T08:58:00", ts: Date.parse("2025-09-30T08:58:00") },
-    { id: "2",  device: "Device A", sensor: "Humidity",    value: 63,   date: "2025-09-30T08:59:00", ts: Date.parse("2025-09-30T08:59:00") },
-    { id: "3",  device: "Device A", sensor: "Light",       value: 312,  date: "2025-09-30T09:00:00", ts: Date.parse("2025-09-30T09:00:00") },
+    { id: "1",  device: "Device A", sensor: "Temperature", value: 38, date: "2025-09-30T08:58:00", ts: Date.parse("2025-09-30T08:58:00") },
+    { id: "2",  device: "Device A", sensor: "Humidity",    value: 35,   date: "2025-09-30T08:59:00", ts: Date.parse("2025-09-30T08:59:00") },
+    { id: "3",  device: "Device A", sensor: "Light",       value: 200,  date: "2025-09-30T09:00:00", ts: Date.parse("2025-09-30T09:00:00") },
     { id: "4",  device: "Device A", sensor: "PIR",         value: "motion", date: "2025-09-30T09:01:00", ts: Date.parse("2025-09-30T09:01:00") },
-    { id: "5",  device: "Device A", sensor: "Temperature", value: 28.1, date: "2025-10-01T07:45:00", ts: Date.parse("2025-10-01T07:45:00") },
-    { id: "6",  device: "Device A", sensor: "Humidity",    value: 61,   date: "2025-10-01T07:46:00", ts: Date.parse("2025-10-01T07:46:00") },
-    { id: "7",  device: "Device A", sensor: "Light",       value: 290,  date: "2025-10-01T07:47:00", ts: Date.parse("2025-10-01T07:47:00") },
+    { id: "5",  device: "Device A", sensor: "Temperature", value: 30, date: "2025-10-01T07:45:00", ts: Date.parse("2025-10-01T07:45:00") },
+    { id: "6",  device: "Device A", sensor: "Humidity",    value: 15,   date: "2025-10-01T07:46:00", ts: Date.parse("2025-10-01T07:46:00") },
+    { id: "7",  device: "Device A", sensor: "Light",       value: 150,  date: "2025-10-01T07:47:00", ts: Date.parse("2025-10-01T07:47:00") },
     { id: "8",  device: "Device A", sensor: "PIR",         value: "no motion", date: "2025-10-01T07:48:00", ts: Date.parse("2025-10-01T07:48:00") },
 
     // === Device B ===

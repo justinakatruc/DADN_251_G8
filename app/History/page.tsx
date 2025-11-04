@@ -5,8 +5,9 @@ import Image from "next/image";
 import { X } from 'lucide-react';
 import TopBar from "@/app/components/TopBar";
 import { useUserStore } from "../store/useUserStore";
-import { baseData, mockDevices } from "../store/mockData";
+import { baseData } from "../store/mockData";
 import { Metric, Row } from "../model";
+import { useDevicesStore } from "../store/useDevicesStore";
 
 //thay data fetch vào đây
 
@@ -18,9 +19,10 @@ export default function HistoryPage() {
   const [activeTab, setActiveTab] = useState<Metric>("Temperature");
   const [timestampFilter, setTimestampFilter] = useState<"All" | "Month" | "Week" | "Day">("Month");
   const [editing, setEditing] = useState(false);
+  const { devices } = useDevicesStore();
   const deviceList = user ? [
     "All",
-    ...mockDevices
+    ...devices
     .filter(device => device.ownerId === user.id)
     .map(device => device.name)
   ] : ['All'];
@@ -150,8 +152,8 @@ export default function HistoryPage() {
                         <td className="px-6 py-6 text-center text-gray-400 border" colSpan={4}>No data</td>
                       </tr>
                     ) : (
-                      data.map(r => (
-                        <tr key={r.id} className="text-sm">
+                      data.map((r, index) => (
+                        <tr key={index} className="text-sm">
                           <td className="px-2 md:px-4 lg:px-6 py-3 border">
                             <div className="flex flex-wrap gap-x-2">
                               <div className="font-medium">

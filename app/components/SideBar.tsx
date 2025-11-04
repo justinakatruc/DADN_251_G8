@@ -18,10 +18,14 @@ export default function SideBar({ onAuthClick }: SideBarProps) {
   const { user, clear } = useUserStore();
   const pathname = usePathname()
   const [showLabel, setShowLabel] = useState<number | null>(null)
-  const menuItems: MenuItem[] = [
+  const menuItems: MenuItem[] = user?.role !== "admin" ? [
     { id: "Reports", icon: "fa fa-line-chart", href: "/" },
     { id: "History", icon: "fa fa-history", href: "/history" },
-  ]
+  ] : [
+    { id: "Reports", icon: "fa fa-line-chart", href: "/" },
+    { id: "History", icon: "fa fa-history", href: "/history" },
+    { id: "Users", icon: "fa fa-users", href: "/users" },
+  ];
 
   const getActiveItem = () => {
     const activeMenuItem = menuItems.find((item) => item.href === pathname);
@@ -134,9 +138,9 @@ export default function SideBar({ onAuthClick }: SideBarProps) {
                   onMouseEnter={() => setShowLabel(index)}
                   onMouseLeave={() => setShowLabel(null)}
                 >
-                  <a href={item.href} className="flex items-center justify-center">
+                  <Link href={item.href} className="flex items-center justify-center">
                     <i className={`text-[18px] ${item.icon} ${item.id == activeItem ? "text-[#1B59F8]" : "text-black"}`} aria-hidden="true"></i>
-                  </a>
+                  </Link>
                 </div>
                 {showLabel === index && (
                   <div className='absolute top-[55px] left-[-13px] md:left-[-5px] w-[65px] flex items-center justify-center text-[11px] font-semibold bg-[rgba(226,229,233,0.5)] text-[#4D4D4D] py-1.5 px-2 rounded-[25px] z-[11]'>

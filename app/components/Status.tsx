@@ -30,7 +30,7 @@ export default function Status({ sensorvalues }: StatusProps) {
     temperature: sensorvalues.temperatureC !== '-',
     humidity: sensorvalues.humidity !== '-',
     light: sensorvalues.lightIntensity !== '-',
-    pir: sensorvalues.pir !== 'no motion',
+    pir: sensorvalues.pir !== '-',
   }
 
   return (

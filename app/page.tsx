@@ -7,18 +7,20 @@ import TopBar from "@/app/components/TopBar";
 import Status from "./components/Status";
 import Weather from "./components/Weather";
 import { useUserStore } from "./store/useUserStore";
-import { baseData, mockDevices } from "./store/mockData";
+import { baseData } from "./store/mockData";
 import { useEffect, useMemo, useState } from "react";
 import { Row } from "./model";
+import { useDevicesStore } from "./store/useDevicesStore";
 
 export default function Home() {
   const { user } = useUserStore();
+  const { devices } = useDevicesStore();
   const deviceList = useMemo(() => {
     if (!user) return ['None'];
-    return mockDevices
+    return devices
       .filter(device => device.ownerId === user.id)
       .map(device => device.name);
-  }, [user]);
+  }, [user, devices]);
   const [deviceFilter, setDeviceFilter] = useState<string>(deviceList[0]);
 
   const [latestData, setLatestData] = useState<Row[]>([]);
