@@ -31,6 +31,8 @@ export default function HistoryPage() {
 
   useEffect(() => {
     if (user) {
+      setSeed([]);
+
       if (userDevices.length > 0) {
         userDevices.forEach(deviceName => {
           baseData.forEach(dataRow => {

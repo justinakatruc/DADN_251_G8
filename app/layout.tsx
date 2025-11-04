@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import AppLayout from "./components/AppLayout";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Yolo:Home app",
@@ -16,6 +17,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased">
         <AppLayout>{children}</AppLayout>
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );

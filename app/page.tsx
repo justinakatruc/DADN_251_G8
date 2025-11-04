@@ -71,11 +71,11 @@ export default function Home() {
   }, [deviceFilter, user]);
 
   const sensorValues = {
-    temperatureC: user ? updatedTemperature + " °C" : '-',
-    temperatureF: user ? updatedTemperature !== '-' ? `${(Number(updatedTemperature) * 9/5 + 32).toFixed(1)} °F` : '-' : '-',
-    humidity: user ? updatedHumidity + "%" : '-',
-    lightIntensity: user ? updatedLight + " lux" : '-',
-    pir: user ? updatedPir : 'no motion',
+    temperatureC: user ? (updatedTemperature !== '-' ? updatedTemperature + " °C" : '-') : '-',
+    temperatureF: user ? (updatedTemperature !== '-' ? `${(Number(updatedTemperature) * 9/5 + 32).toFixed(1)} °F` : '-') : '-',
+    humidity: user ? (updatedHumidity !== '-' ? updatedHumidity + "%" : '-') : '-',
+    lightIntensity: user ? (updatedLight !== '-' ? updatedLight + " lux" : '-') : '-',
+    pir: user ? (updatedPir !== '-' ? updatedPir : '-') : '-',
   }
 
   useEffect(() => {

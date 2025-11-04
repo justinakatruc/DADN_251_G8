@@ -110,7 +110,30 @@ export default function SideBar({ onAuthClick }: SideBarProps) {
         </div>
       </div>
       <div className="px-3 md:px-7 lg:hidden flex items-center justify-between">
-        <Link className="text-black text-2xl md:text-3xl font-bold my-6" href="/">Yolo:Home</Link>
+        <div className="my-6 flex flex-col gap-y-2">
+          <Link className="text-black text-2xl md:text-3xl font-bold " href="/">Yolo:Home</Link>
+          {
+            user && (
+              <div className="w-full flex gap-x-1 flex-wrap">
+                <div className="font-semibold">
+                  {user.email.split("@")[0].charAt(0).toUpperCase() + user.email.split("@")[0].slice(1)}
+                </div>
+                <div>
+                  -
+                </div>
+                <div className="text-[#4D4D4D]">
+                  {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                </div>
+                <div>
+                  -
+                </div>
+                <div className="text-[#4D4D4D] text-[14px]">
+                  {user.email}
+                </div>
+              </div>
+            )
+          }
+        </div>
         <div className="flex gap-x-[10px] md:gap-x-[20px] items-center">
           {
             !user && (
@@ -128,8 +151,7 @@ export default function SideBar({ onAuthClick }: SideBarProps) {
                   Sign up
                 </button>
               </>
-            )
-          }
+            )}
           {
             menuItems.map((item, index) => (
               <div key={index} className="relative">
