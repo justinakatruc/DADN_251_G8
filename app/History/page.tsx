@@ -1,62 +1,49 @@
-// import AppLayout from "@/app/components/AppLayout"
-// import Image from "next/image"
-// import TopBar from "@/app/components/TopBar";
-
-// export default function HistoryPage() {
-//   return (
-//     <AppLayout>
-//       <div className="p-8 w-full">
-//         <div className="w-full flex items-center justify-between pb-5 border-b border-[rgba(0,0,0,0.1)]">
-//           <h1 className="text-2xl font-bold">History</h1>
-//           <div className="flex gap-x-2.5 items-center">
-//             <Image
-//               src="/icons/download.png"
-//               alt="Download Icon"
-//               width={24}
-//               height={24}
-//             />
-//             <div className="font-semibold text-[#4D4D4D] text-[13px]">
-//               Downloads
-//             </div>
-//           </div>
-//         </div>
-//         <div>
-//           <TopBar
-//             timestampItems={["All", "5 min ago", "10 min ago", "15 min ago"]}
-//             deviceItems={["All", "Device A", "Device B"]}
-//             showAddButton={false}
-//           />
-//         </div>
-//       </div>
-//     </AppLayout>
-//   );
-// }
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import AppLayout from "@/app/components/AppLayout";
+import { X } from 'lucide-react';
 import TopBar from "@/app/components/TopBar";
+import { useUserStore } from "../store/useUserStore";
+import { baseData } from "../store/mockData";
+import { Metric, Row } from "../model";
+import { useDevicesStore } from "../store/useDevicesStore";
 
-// ===== Demo data (thay bằng fetch API của bạn) =====
-type Metric = "Temperature" | "Humidity" | "Light" | "PIR";
-type Row = { id: string; device: string; sensor: Metric; value: string | number; date: string; ts: number };
-
-const seed: Row[] = [
-  { id: "1", device: "Device A", sensor: "Temperature", value: 27.6, date: "2025-09-30T08:58:00", ts: Date.parse("2025-09-30T08:58:00") },
-  { id: "2", device: "Device A", sensor: "Humidity",    value: 63,   date: "2025-09-30T08:59:00", ts: Date.parse("2025-09-30T08:59:00") },
-  { id: "3", device: "Device B", sensor: "Light",        value: 312,  date: "2025-09-30T09:00:00", ts: Date.parse("2025-09-30T09:00:00") },
-  { id: "4", device: "Device B", sensor: "PIR",          value: "motion", date:"2025-09-30T09:01:00", ts: Date.parse("2025-09-30T09:01:00") },
-  { id: "5", device: "Device A", sensor: "Temperature", value: 27.9, date: "2025-09-30T09:02:00", ts: Date.parse("2025-09-30T09:02:00") },
-]; //thay data fetch vào đây
+//thay data fetch vào đây
 
 const metrics: Metric[] = ["Temperature", "Humidity", "Light", "PIR"];
 
 export default function HistoryPage() {
+  const { user, userDevices } = useUserStore();
+  const [seed, setSeed] = useState<Row[]>([]);
   const [activeTab, setActiveTab] = useState<Metric>("Temperature");
-  const [timestampFilter, setTimestampFilter] = useState<"All" | "5" | "10" | "15">("All");
-  const [deviceFilter, setDeviceFilter] = useState<"All" | "Device A" | "Device B">("All");
+  const [timestampFilter, setTimestampFilter] = useState<"All" | "Month" | "Week" | "Day">("Month");
   const [editing, setEditing] = useState(false);
+  const { devices } = useDevicesStore();
+  const deviceList = user ? [
+    "All",
+    ...devices
+    .filter(device => device.ownerId === user.id)
+    .map(device => device.name)
+  ] : ['All'];
+  
+  const [deviceFilter, setDeviceFilter] = useState<string>("All");
+
+  useEffect(() => {
+    if (user) {
+      setSeed([]);
+
+      if (userDevices.length > 0) {
+        userDevices.forEach(deviceName => {
+          baseData.forEach(dataRow => {
+            if (dataRow.device === deviceName) {
+              setSeed(prev => [...prev, dataRow]);
+            }
+          });
+        })
+      }
+    }
+  }, [user, userDevices]);
 
   const data = useMemo(() => {
     let rows = seed.filter(r => r.sensor === activeTab);
@@ -64,11 +51,15 @@ export default function HistoryPage() {
     // nếu cần lọc theo mốc thời gian (giả lập “N phút trước” quanh 09:00)
     const baseline = Date.parse("2025-09-30T09:00:00");
     if (timestampFilter !== "All") {
-      const n = Number(timestampFilter) * 60 * 1000;
-      rows = rows.filter(r => r.ts >= baseline - n && r.ts <= baseline);
-    }
+      const n =
+        timestampFilter === "Day" ? 1 :
+        timestampFilter === "Week" ? 7 :
+        30;
+        const range = n * 24 * 60 * 60 * 1000;
+        rows = rows.filter(r => r.ts >= baseline - range);
+      }
     return rows.sort((a,b) => b.ts - a.ts);
-  }, [activeTab, deviceFilter, timestampFilter]);
+  }, [activeTab, deviceFilter, timestampFilter, seed]);
 
   const handleDownloadCSV = () => {
     const header = "Device,Sensor,Value,Date\n";
@@ -82,105 +73,131 @@ export default function HistoryPage() {
     URL.revokeObjectURL(url);
   };
 
+  const handleData = (id: string) => {
+    setSeed(prev => prev.filter(r => r.id !== id));
+  }
+
   return (
-    <div>
-      <div className="p-8 w-full">
-        {/* Header */}
-        <div className="w-full flex items-center justify-between pb-5 border-b border-black/10">
-          <h1 className="text-2xl font-bold">History</h1>
-          <button onClick={handleDownloadCSV} className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-100">
-            <Image src="/icons/download.png" alt="Download" width={20} height={20} />
-            <span className="font-semibold text-[#4D4D4D] text-[13px]">Download</span>
-          </button>
+    <div className="p-8 w-full">
+      {/* Header */}
+      <div className="w-full flex items-center justify-between pb-5 border-b border-black/10">
+        <h1 className="text-2xl font-bold">History</h1>
+        <button onClick={handleDownloadCSV} className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-100 cursor-pointer">
+          <Image src="/icons/download.png" alt="Download" width={20} height={20} />
+          <span className="font-semibold text-[#4D4D4D] text-[13px]">Download</span>
+        </button>
+      </div>
+
+      {/* TopBar */}
+      <TopBar
+        timestampItems={["All", "Month", "Week", "Day"]}
+        deviceItems={deviceList}
+        showAddButton={false}
+        onChangeTimestamp={(label) => setTimestampFilter(label.startsWith("A") ? "All" : (label.split(" ")[0] as "Month"|"Week"|"Day"))}
+        onChangeDevice={(v: string) => setDeviceFilter(v)}
+      />
+
+      {/* Tabs */}
+      <div className="mt-6">
+        <div className="flex gap-6 border-b border-gray-200">
+          {metrics.map(m => (
+            <button
+              key={m}
+              onClick={() => setActiveTab(m)}
+              className={`pb-2 -mb-px text-sm font-medium cursor-pointer ${
+                activeTab === m ? "border-b-2 border-black text-black" : "text-gray-500 hover:text-black"
+              }`}
+            >
+              {m}
+            </button>
+          ))}
         </div>
 
-        {/* TopBar (giữ API cũ) */}
+        {/* Table + Edit */}
         <div className="mt-4">
-          <TopBar
-            timestampItems={["All", "5 min ago", "10 min ago", "15 min ago"]}
-            deviceItems={["All", "Device A", "Device B"]}
-            showAddButton={false}
-            // TopBar bắn sự kiện ra ngoài
-            onChangeTimestamp={(label) => setTimestampFilter(label.startsWith("A") ? "All" : (label.split(" ")[0] as "5"|"10"|"15"))}
-            onChangeDevice={(v) => setDeviceFilter(v as any)}
-          />
-        </div>
-
-        {/* Tabs */}
-        <div className="mt-6">
-          <div className="flex gap-6 border-b border-gray-200">
-            {metrics.map(m => (
-              <button
-                key={m}
-                onClick={() => setActiveTab(m)}
-                className={`pb-2 -mb-px text-sm font-medium ${
-                  activeTab === m ? "border-b-2 border-black text-black" : "text-gray-500 hover:text-black"
-                }`}
-              >
-                {m}
-              </button>
-            ))}
+          <div className="flex justify-end">
+            {
+              user && (
+                <button
+                  onClick={() => setEditing(v => !v)}
+                  className="px-4 py-2 text-sm font-semibold cursor-pointer bg-[#4C6FFF] text-white rounded-lg hover:opacity-90"
+                >
+                  {editing ? "Done" : "Edit"}
+                </button>
+              )
+            }
           </div>
 
-          {/* Table + Edit */}
-          <div className="mt-4">
-            <div className="flex justify-end">
-              <button
-                onClick={() => setEditing(v => !v)}
-                className="px-4 py-2 text-sm font-semibold bg-[#4C6FFF] text-white rounded-lg hover:opacity-90"
-              >
-                {editing ? "Done" : "Edit"}
-              </button>
-            </div>
+          {
+            !user && (
+              <div className="w-full h-[500px] flex items-center justify-center">
+                <Image src="/icons/yolohome.png" alt="Yolo Home" width={225} height={225} />
+              </div>
+            )
+          }
 
-            <div className="mt-3 rounded-2xl border border-gray-200 overflow-hidden">
-              <table className="w-full table-fixed">
-                <thead className="bg-gray-50 text-left text-sm">
-                  <tr>
-                    <th className="px-6 py-3 w-[25%] border">Device</th>
-                    <th className="px-6 py-3 w-[25%] border">Sensor</th>
-                    <th className="px-6 py-3 w-[25%] border">Value</th>
-                    <th className="px-6 py-3 w-[25%] border">Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.length === 0 ? (
+          {
+            user && (
+              <div className="mt-3 rounded-2xl border border-gray-200 max-h-[500px] overflow-y-auto">
+                <table className="w-full table-fixed">
+                  <thead className="bg-gray-50 text-left text-sm">
                     <tr>
-                      <td className="px-6 py-6 text-center text-gray-400 border" colSpan={4}>No data</td>
+                      <th className="px-6 py-3 w-[25%] border">Device</th>
+                      <th className="px-6 py-3 w-[25%] border">Sensor</th>
+                      <th className="px-6 py-3 w-[25%] border">Value</th>
+                      <th className="px-6 py-3 w-[25%] border">Date</th>
                     </tr>
-                  ) : (
-                    data.map(r => (
-                      <tr key={r.id} className="text-sm">
-                        <td className="px-6 py-3 border">{r.device}</td>
-                        <td className="px-6 py-3 border">{r.sensor}</td>
-                        <td className="px-6 py-3 border">
-                          {editing ? (
-                            <input
-                              className="w-24 rounded-md border px-2 py-1"
-                              defaultValue={String(r.value)}
-                              onBlur={(e) => { r.value = e.target.value; /* TODO: gọi API cập nhật */ }}
-                            />
-                          ) : (
-                            r.value
-                          )}
-                        </td>
-                        <td className="px-6 py-3 border">{new Date(r.date).toLocaleString()}</td>
+                  </thead>
+                  <tbody>
+                    {data.length === 0 ? (
+                      <tr>
+                        <td className="px-6 py-6 text-center text-gray-400 border" colSpan={4}>No data</td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                    ) : (
+                      data.map((r, index) => (
+                        <tr key={index} className="text-sm">
+                          <td className="px-2 md:px-4 lg:px-6 py-3 border">
+                            <div className="flex flex-wrap gap-x-2">
+                              <div className="font-medium">
+                                {r.device}
+                              </div>
+                              {
+                                editing && (
+                                  <button
+                                    className="size-[20px] rounded-full border flex items-center justify-center bg-[#FF5C5C] hover:opacity-90 cursor-pointer"
+                                    onClick={() => {
+                                      handleData(r.id);
+                                    }}
+                                  >
+                                    <X className="text-white" size={16} />
+                                  </button>
+                                )
+                              }
+                            </div>
+                          </td>
+                          <td className="px-2 md:px-4 lg:px-6 py-3 border">{r.sensor}</td>
+                          <td className="px-2 md:px-4 lg:px-6 py-3 border">
+                            {editing ? (
+                              <input
+                                className="w-24 rounded-md border px-2 py-1"
+                                defaultValue={String(r.value)}
+                                onBlur={(e) => { r.value = e.target.value; /* TODO: gọi API cập nhật */ }}
+                              />
+                            ) : (
+                              r.value
+                            )}
+                          </td>
+                          <td className="px-2 md:px-4 lg:px-6 py-3 border">{new Date(r.date).toISOString().replace("T", " ").slice(0, 19)}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )
+          }
         </div>
       </div>
-      {/* <div>
-        <TopBar
-          timestampItems={["All", "5 min ago", "10 min ago", "15 min ago"]}
-          deviceItems={["All", "Device A", "Device B"]}
-          showAddButton={false}
-        />
-      </div> */}
     </div>
   );
 }

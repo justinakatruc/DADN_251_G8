@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { Activity, Lightbulb } from 'lucide-react'
 
 function Bar({ state }: { state: boolean }) {
   return (
@@ -12,9 +15,26 @@ function Bar({ state }: { state: boolean }) {
   );
 }
 
-export default function Status() {
+type StatusProps = {
+  sensorvalues: {
+    temperatureC: string | number,
+    temperatureF: string | number,
+    humidity: string | number,
+    lightIntensity: string | number,
+    pir: string | number,
+  }
+}
+
+export default function Status({ sensorvalues }: StatusProps) {
+  const statuses = {
+    temperature: sensorvalues.temperatureC !== '-',
+    humidity: sensorvalues.humidity !== '-',
+    light: sensorvalues.lightIntensity !== '-',
+    pir: sensorvalues.pir !== '-',
+  }
+
   return (
-    <div className="my-4 w-full flex flex-col gap-2">
+    <div className="lg:mt-[30px] w-full flex flex-col gap-y-[30px]">
       <div className="w-full p-2 bg-white rounded-[19px] shadow-md border">
         <h2 className="mx-4 my-1 font-bold">Current Status</h2>
         <div className="flex flex-row w-full font-semibold p-2">
@@ -27,7 +47,7 @@ export default function Status() {
           />
           <div className="w-full">
             <span>Temperature Sensor</span>
-            <Bar state={true} />
+            <Bar state={statuses.temperature} />
           </div>
         </div>
         <div className="flex flex-row w-full font-semibold p-2">
@@ -40,7 +60,7 @@ export default function Status() {
           />
           <div className="w-full">
             <span>Humidity Sensor</span>
-            <Bar state={true} />
+            <Bar state={statuses.humidity} />
           </div>
         </div>
         <div className="flex flex-row w-full font-semibold p-2">
@@ -52,36 +72,24 @@ export default function Status() {
             className="m-2"
           />
           <div className="w-full">
-            <span>Temperature Sensor</span>
-            <Bar state={true} />
+            <span>Light Sensor</span>
+            <Bar state={statuses.light} />
           </div>
         </div>
       </div>
       <div className="w-full p-2 bg-white rounded-[19px] shadow-md border">
         <h2 className="mx-4 my-1 font-bold">Current Status</h2>
         <div className="flex flex-row w-full font-semibold p-2">
-          <Image
-            src={"./icons/temp-three-quarters.svg"}
-            alt="Temperature Icon"
-            width={24}
-            height={24}
-            className="m-2"
-          />
+          <Activity className="m-2" size={24} />
           <div className="w-full">
-            <span>Temperature Sensor</span>
-            <Bar state={false} />
+            <span>PIR Sensor</span>
+            <Bar state={statuses.pir} />
           </div>
         </div>
         <div className="flex flex-row w-full font-semibold p-2">
-          <Image
-            src={"./icons/humidity.svg"}
-            alt="Temperature Icon"
-            width={24}
-            height={24}
-            className="m-2"
-          />
+          <Lightbulb className="m-2" size={24} />
           <div className="w-full">
-            <span>Humidity Sensor</span>
+            <span>Light</span>
             <Bar state={false} />
           </div>
         </div>

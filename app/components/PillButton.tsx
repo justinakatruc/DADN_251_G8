@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -20,13 +20,9 @@ interface PillButtonProps {
  * with subtle focus and hover styling.
  */
 export default function PillButton({ label, items, onChange }: PillButtonProps) {
-  const [selected, setSelected] = useState(items[0] || "");
+  const [selected, setSelected] = useState(label === "Timestamp" ? items[1] : items[0]);
   const hasDropdown = items.length > 1;
 
-  useEffect(() => {
-    setSelected(items[0] || "");
-  }, [items]);
-  
   return (
     <>
       {hasDropdown ? (
@@ -45,7 +41,8 @@ export default function PillButton({ label, items, onChange }: PillButtonProps) 
               bg-white
               text-[--text-soft]
               text-lg
-              min-w-[20rem]
+              lg:min-w-[20rem]
+              min-w-[13rem]
               px-4 py-5
               shadow-none
               hover:border-[#CFCFCF]
@@ -55,7 +52,7 @@ export default function PillButton({ label, items, onChange }: PillButtonProps) 
           >
             <div className="flex items-center">
               <span className="font-normal mr-1">{label}:</span>
-              <SelectValue placeholder={selected} className="font-medium" />
+              <SelectValue className="font-medium" />
             </div>
           </SelectTrigger>
 

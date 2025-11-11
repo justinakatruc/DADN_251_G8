@@ -1,6 +1,10 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
+import { Account } from "../model";
+import { mockAccounts, mockDevices, mockUsers } from "../store/mockData";
+import { useUserStore } from "../store/useUserStore";
+import { toast } from "sonner";
 
 interface AuthOverlayProps {
   initialMode?: "login" | "signup";
@@ -30,7 +34,7 @@ function AuthTemplate({
         {onClose && (
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl font-bold"
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl font-bold cursor-pointer"
           >
             ✕
           </button>
@@ -39,7 +43,7 @@ function AuthTemplate({
           <h2 className="text-[#262626] font-semibold text-3xl md:text-4xl">
             {title}
           </h2>
-          <p className="text-[#4d4d4d] text-sm sm:text-base font-medium mt-2">
+          <p className="text-[#4d4d4d] text-sm sm:text-base mt-2">
             {subtitle}
           </p>
         </div>
@@ -49,6 +53,10 @@ function AuthTemplate({
   );
 }
 
+type FormErrors = {
+  [key: string]: string;
+};
+
 interface AuthToggleType {
   authToggle: boolean;
   setAuthToggle: React.Dispatch<React.SetStateAction<boolean>>;
@@ -56,37 +64,102 @@ interface AuthToggleType {
 }
 
 function SignInOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
+  const { setUser, setUserDevices } = useUserStore();
+  const baseData: Account = { email: "", password: "" };
+  
+  const [formData, setFormData] = useState<Account>(baseData);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const validateForm = () : boolean => {
+    const newErrors: FormErrors = {};
+
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email is invalid";
+    }
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
+  const handleLogin = async () => {
+    setErrors({});
+
+    if (!validateForm()) {
+      return;
+    }
+
+    const newErrors: FormErrors = {};
+    setIsLoading(true);
+
+    setTimeout(() => {
+      const account = mockAccounts.find(acc => acc.email === formData.email && acc.password === formData.password);
+      if (account) {
+        const foundUser = mockUsers.find((user) => user.email === account.email);
+        if (foundUser) {
+          setUser(foundUser);
+          const deviceList = mockDevices.filter(device => device.ownerId === foundUser.id).map(device => device.name);
+          setUserDevices(deviceList);
+          setIsLoading(false);
+          toast.success("Login successful!");
+          if (onClose) onClose();
+        } else {
+          toast.error("User not found.");
+        }
+      } else {
+        newErrors.general = "Invalid email or password";
+        setErrors(newErrors);
+        toast.error("Invalid email or password");
+      }
+      setIsLoading(false);
+    }, 1000);
+  }
+
   return (
     <AuthTemplate
       title="Login"
       subtitle="Welcome back! Please login to access your account."
       onClose={onClose}
     >
-      <div className="flex flex-col w-full items-start my-2">
-        <div className="w-full my-2">
+      <div className="flex flex-col w-full items-start my-2 px-2 md:px-0">
+        <div className="w-full flex flex-col gap-y-1 my-2">
           <label className="text-[#262626] text-sm sm:text-base font-medium">
             Email
           </label>
           <div className="w-full bg-gray-100 border-xl border-gray-400 rounded-md my-2">
             <input
               className="w-full p-2 sm:p-4 placeholder:text-[#666666] bg-transparent border-none outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
               type="email"
               placeholder="Enter your Email"
             />
           </div>
+          {errors.email && (<div className="text-red-500 text-sm">{errors.email}</div>)}
         </div>
         <div className="w-full my-2">
-          <div className="w-full">
+          <div className="w-full flex flex-col gap-y-1">
             <label className="text-[#262626] text-sm sm:text-base font-medium">
               Password
             </label>
             <div className="w-full bg-gray-100 border-xl border-gray-400 rounded-md my-2">
               <input
                 className="w-full p-2 sm:p-4 placeholder:text-[#666666] bg-transparent border-none outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
                 type="password"
                 placeholder="Enter your Password"
               />
             </div>
+            {errors.password && (<div className="text-red-500 text-sm">{errors.password}</div>)}
           </div>
           <div className="text-end w-full">
             <a
@@ -96,9 +169,12 @@ function SignInOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
               Forgot your password?
             </a>
           </div>
+          {errors.general && (<div className="text-red-500 text-sm">{errors.general}</div>)}
           <button
             type="submit"
-            className="block w-full bg-[#4E7EF9] rounded-md text-center p-2 my-4 text-white text-sm sm:text-base font-medium hover:bg-blue-600 transition-colors"
+            disabled={isLoading}
+            className="block w-full bg-[#4E7EF9] rounded-md text-center p-2 my-4 text-white text-sm sm:text-base font-medium hover:bg-blue-600 transition-colors cursor-pointer"
+            onClick={handleLogin}
           >
             Login
           </button>
@@ -139,6 +215,60 @@ function SignInOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
 }
 
 function SignUpOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
+  const baseData: Account = { email: "", password: "" };
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [formData, setFormData] = useState<Account>(baseData);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const validateForm = () : boolean => {
+    const newErrors: FormErrors = {};
+
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email is invalid";
+    }
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    }
+    if (formData.password !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
+  const handleSignUp = async () => {
+    setErrors({});
+    if (!validateForm()) {
+      return;
+    }
+
+    const newErrors: FormErrors = {};
+    setIsLoading(true);
+
+    setTimeout(() => {
+      const existingAccount = mockAccounts.find(acc => acc.email === formData.email);
+      if (existingAccount) {
+        newErrors.general = "An account with this email already exists";
+        setErrors(newErrors);
+        toast.error("An account with this email already exists");
+      } else {
+        mockUsers.push({
+          id: mockUsers.length + 1,
+          email: formData.email,
+          role: "user"
+        });
+        mockAccounts.push({ email: formData.email, password: formData.password });
+        setIsLoading(false);
+        toast.success("Sign up successful! Please log in.");
+        setAuthToggle(!authToggle);
+      }
+    }, 1000);
+  }
+
   return (
     <AuthTemplate
       title="Sign Up"
@@ -155,8 +285,13 @@ function SignUpOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
               className="w-full p-2 sm:p-4 placeholder:text-[#666666] bg-transparent border-none outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
               type="email"
               placeholder="Enter your Email"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
             />
           </div>
+          {errors.email && (<div className="text-red-500 text-sm">{errors.email}</div>)}
         </div>
         <div className="w-full my-2">
           <div className="w-full mb-2">
@@ -168,8 +303,13 @@ function SignUpOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
                 className="w-full p-2 sm:p-4 placeholder:text-[#666666] bg-transparent border-none outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
                 type="password"
                 placeholder="Enter your Password"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
               />
             </div>
+            {errors.password && (<div className="text-red-500 text-sm">{errors.password}</div>)}
           </div>
           <div className="w-full mt-2">
             <label className="text-[#262626] text-sm sm:text-base font-medium">
@@ -180,12 +320,18 @@ function SignUpOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
                 className="w-full p-2 sm:p-4 placeholder:text-[#666666] bg-transparent border-none outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
                 type="password"
                 placeholder="Confirm your Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
               />
             </div>
+            {errors.confirmPassword && (<div className="text-red-500 text-sm">{errors.confirmPassword}</div>)}
           </div>
+          {errors.general && (<div className="text-red-500 text-sm">{errors.general}</div>)}
           <button
             type="submit"
-            className="block w-full bg-[#4E7EF9] rounded-md text-center p-2 my-4 text-white text-sm sm:text-base font-medium hover:bg-blue-600 transition-colors"
+            className="block w-full bg-[#4E7EF9] rounded-md text-center p-2 my-4 text-white text-sm sm:text-base font-medium hover:bg-blue-600 transition-colors cursor-pointer"
+            disabled={isLoading}
+            onClick={handleSignUp}
           >
             Sign Up
           </button>
