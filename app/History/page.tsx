@@ -9,6 +9,22 @@ import { userAPI } from "@/lib/api";
 import { toast } from "sonner";
 // import { useDevicesStore } from "../store/useDevicesStore";
 
+function TableRowSkeleton() {
+  return (
+    <tr className="animate-pulse">
+      <td className="px-2 md:px-4 lg:px-6 py-3 border">
+        <div className="h-4 bg-gray-200 rounded w-20"></div>
+      </td>
+      <td className="px-2 md:px-4 lg:px-6 py-3 border">
+        <div className="h-4 bg-gray-200 rounded w-16"></div>
+      </td>
+      <td className="px-2 md:px-4 lg:px-6 py-3 border">
+        <div className="h-4 bg-gray-200 rounded w-32"></div>
+      </td>
+    </tr>
+  );
+}
+
 const metrics: Metric[] = ["Temperature", "Humidity", "Light"];
 
 export default function HistoryPage() {
@@ -20,11 +36,12 @@ export default function HistoryPage() {
     "All" | "Month" | "Week" | "Day"
   >("Month");
   const [editing, setEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchHistoryData = useCallback(
     async (timestampFilter: "All" | "Month" | "Week" | "Day") => {
       if (!user) return;
-
+      setIsLoading(true);
       try {
         const response = await userAPI.getHistoryData(
           user.id,
@@ -90,6 +107,8 @@ export default function HistoryPage() {
       } catch (error) {
         console.error("Error fetching history data:", error);
         return false;
+      } finally {
+        setIsLoading(false);
       }
     },
     [user]
@@ -246,7 +265,16 @@ export default function HistoryPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.length === 0 ? (
+                  {isLoading ? (
+                    // Show loading skeleton rows
+                    <>
+                      <TableRowSkeleton />
+                      <TableRowSkeleton />
+                      <TableRowSkeleton />
+                      <TableRowSkeleton />
+                      <TableRowSkeleton />
+                    </>
+                  ) : data.length === 0 ? (
                     <tr>
                       <td
                         className="px-6 py-6 text-center text-gray-400 border"

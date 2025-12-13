@@ -13,6 +13,25 @@ import { adminAPI } from "@/lib/api";
 //   ownerId: number;
 // };
 
+function TableRowSkeleton() {
+  return (
+    <tr className="animate-pulse">
+      <td className="px-2 md:px-4 lg:px-6 py-3 border">
+        <div className="h-4 bg-gray-200 rounded w-20"></div>
+      </td>
+      <td className="px-2 md:px-4 lg:px-6 py-3 border">
+        <div className="h-4 bg-gray-200 rounded w-16"></div>
+      </td>
+      <td className="px-2 md:px-4 lg:px-6 py-3 border">
+        <div className="h-4 bg-gray-200 rounded w-32"></div>
+      </td>
+      <td className="px-2 md:px-4 lg:px-6 py-3 border">
+        <div className="h-4 bg-gray-200 rounded w-32"></div>
+      </td>
+    </tr>
+  );
+}
+
 type FormErrors = {
   [key: string]: string;
 };
@@ -42,6 +61,7 @@ export default function UsersPage() {
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserRole, setNewUserRole] = useState<"admin" | "user">("user");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDeleteUser = async (userId: string) => {
     const result = await adminAPI.deleteUser(
@@ -137,10 +157,12 @@ export default function UsersPage() {
   // };
 
   const fetchUsers = async () => {
+    setIsLoading(true);
     const result = await adminAPI.getUsers(localStorage.getItem("token") || "");
     if (result.success) {
       setUserList(result.users);
     }
+    setIsLoading(false);
   };
 
   const handleUpdateUser = async () => {
@@ -216,7 +238,16 @@ export default function UsersPage() {
             </tr>
           </thead>
           <tbody>
-            {userList.length === 0 ? (
+            {isLoading ? (
+              // Show loading skeleton rows
+              <>
+                <TableRowSkeleton />
+                <TableRowSkeleton />
+                <TableRowSkeleton />
+                <TableRowSkeleton />
+                <TableRowSkeleton />
+              </>
+            ) : userList.length === 0 ? (
               <tr>
                 <td
                   className="px-6 py-6 text-center text-gray-400 border"
@@ -236,7 +267,7 @@ export default function UsersPage() {
                       <div className="font-medium">{r.email}</div>
                     </div>
                   </td>
-                  <td className="px-6 py-3 border">{r.role}</td>
+                  <td className="px-6 py-3 border capitalize">{r.role}</td>
                   <td className="px-6 py-3 border flex space-x-2">
                     <button
                       className="cursor-pointer border w-[38px] h-8 flex items-center justify-center hover:bg-gray-100 rounded-md px-2.5 py-2 font-medium"

@@ -6,7 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret";
 
 async function handleGetHistoryData(
   userId: string,
-  timestampFilter: "All" | "Month" | "Week" | "Day"
+  timestampFilter: "All" | "Year" | "Month" | "Week" | "Day"
 ) {
   if (!userId) {
     return NextResponse.json(
@@ -30,6 +30,11 @@ async function handleGetHistoryData(
     const now = Date.now();
     let timestampFilterDate: number;
     switch (timestampFilter) {
+      case "Year":
+        const oneYearAgo = new Date();
+        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+        timestampFilterDate = oneYearAgo.getTime();
+        break;
       case "Month":
         timestampFilterDate = now - 30 * 24 * 60 * 60 * 1000;
         break;

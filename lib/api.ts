@@ -36,7 +36,7 @@ export const userAPI = {
   getHistoryData: async (
     userId: string,
     token: string,
-    timestampFilter: "All" | "Month" | "Week" | "Day"
+    timestampFilter: "All"| "Year" | "Month" | "Week" | "Day"
   ) => {
     const response = await fetch(`${BASE_API}/user`, {
       method: "POST",

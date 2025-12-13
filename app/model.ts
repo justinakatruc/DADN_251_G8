@@ -19,3 +19,10 @@ export type Row = {
   date: string;
   ts: number;
 };
+
+export type HistoryDataItem = {
+  id: string;
+  timestamp: string;
+  value: number;
+  timestamp_local: string;
+};

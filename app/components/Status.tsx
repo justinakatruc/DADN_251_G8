@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Activity, Lightbulb } from 'lucide-react'
+import { Activity, Lightbulb } from "lucide-react";
 
 function Bar({ state }: { state: boolean }) {
   return (
@@ -17,21 +17,21 @@ function Bar({ state }: { state: boolean }) {
 
 type StatusProps = {
   sensorvalues: {
-    temperatureC: string | number,
-    temperatureF: string | number,
-    humidity: string | number,
-    lightIntensity: string | number,
-    pir: string | number,
-  }
-}
+    temperatureC: string | number;
+    temperatureF: string | number;
+    humidity: string | number;
+    lightIntensity: string | number;
+    pir: string | number;
+  };
+};
 
 export default function Status({ sensorvalues }: StatusProps) {
   const statuses = {
-    temperature: sensorvalues.temperatureC !== '-',
-    humidity: sensorvalues.humidity !== '-',
-    light: sensorvalues.lightIntensity !== '-',
-    pir: sensorvalues.pir !== '-',
-  }
+    temperature: sensorvalues.temperatureC !== "-",
+    humidity: sensorvalues.humidity !== "-",
+    light: sensorvalues.lightIntensity !== "-",
+    pir: sensorvalues.pir !== "-",
+  };
 
   return (
     <div className="lg:mt-[30px] w-full flex flex-col gap-y-[30px]">
@@ -64,13 +64,7 @@ export default function Status({ sensorvalues }: StatusProps) {
           </div>
         </div>
         <div className="flex flex-row w-full font-semibold p-2">
-          <Image
-            src={"./icons/temp-three-quarters.svg"}
-            alt="Temperature Icon"
-            width={24}
-            height={24}
-            className="m-2"
-          />
+          <Lightbulb className="m-2" size={24} />
           <div className="w-full">
             <span>Light Sensor</span>
             <Bar state={statuses.light} />

@@ -26,7 +26,7 @@ function AuthTemplate({
   onClose,
 }: AuthTemplateProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center caret-transparent select-none">
       <div
         onClick={onClose}
         className="absolute inset-0 bg-black/50 backdrop-blur-[2px] items-center"
@@ -186,7 +186,7 @@ function SignInOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
           >
             Login
           </button>
-          <div className="flex items-center w-full my-2 sm:my-4">
+          <div className="flex items-center w-full my-2 sm:my-4 caret-transparent">
             <div className="flex-grow border-t border-gray-300"></div>
             <span className="mx-2 sm:mx-3 text-[#666666] text-sm sm:text-base font-medium">
               OR
@@ -355,7 +355,7 @@ function SignUpOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
           >
             Sign Up
           </button>
-          <div className="flex items-center w-full my-2 sm:my-4">
+          <div className="flex items-center w-full my-2 sm:my-4 caret-transparent">
             <div className="flex-grow border-t border-gray-300"></div>
             <span className="mx-2 sm:mx-3 text-[#666666] text-sm sm:text-base font-medium">
               OR

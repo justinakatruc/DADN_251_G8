@@ -107,16 +107,16 @@ async function LoadAirQualityCategory(): Promise<AQData> {
     color = "#EEE957";
   } else if (pm2_5 <= 150) {
     category = "Unhealthy for Sensitive Groups";
-    color = "#fbbf24"; // orange-400
+    color = "#fbbf24";
   } else if (pm2_5 <= 200) {
     category = "Unhealthy";
     color = "#ED7771";
   } else if (pm2_5 <= 300) {
     category = "Very Unhealthy";
-    color = "#a21caf"; // purple-800
+    color = "#a21caf";
   } else {
     category = "Hazardous";
-    color = "#6b7280"; // gray-500
+    color = "#6b7280";
   }
 
   return { pm2_5, category, color };
@@ -155,7 +155,7 @@ export default function Weather() {
   }, []);
 
   if (loading) {
-    return <div className="text-center p-4">Loading weather data...</div>;
+    return <div className="text-center p-4 m-10">Loading weather data...</div>;
   }
 
   return (
