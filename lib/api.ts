@@ -30,6 +30,34 @@ export const authAPI = {
     });
     return reponse.json();
   },
+
+  forgotPassword: async (email: string) => {
+    const response = await fetch(`${BASE_API}/auth`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        action: "forgot-password",
+        email,
+      }),
+    });
+    return response.json();
+  },
+
+  resetPassword: async (data: { token: string; newPassword: string }) => {
+    const response = await fetch(
+      `${BASE_API}/auth/reset-password?token=${data.token}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ newPassword: data.newPassword }),
+      }
+    );
+    return response.json();
+  }
 };
 
 export const userAPI = {

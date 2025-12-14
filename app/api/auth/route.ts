@@ -49,6 +49,82 @@ async function sendVerificationEmail(toEmail: string, token: string) {
 }
 
 
+// Hàm gửi email Đặt lại Mật khẩu
+async function sendResetPasswordEmail(toEmail: string, token: string) {
+  // URL này trỏ đến route handler mới mà chúng ta sẽ tạo, ví dụ: /reset-password?token=...
+  // Đây sẽ là một trang UI trên client (Next.js Page) để người dùng nhập mật khẩu mới.
+  const resetLink = `${process.env.BASE_URL}/reset-password?token=${token}`; 
+
+  const mailOptions = {
+    from: `Yolo Home <${EMAIL_USER}>`,
+    to: toEmail,
+    subject: "Yêu cầu Đặt lại Mật khẩu",
+    html: `
+            <h1>Đặt lại Mật khẩu của bạn</h1>
+            <p>Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn. Vui lòng nhấp vào liên kết dưới đây:</p>
+            <a href="${resetLink}" style="padding: 10px 20px; background-color: #FF6F61; color: white; text-decoration: none; border-radius: 5px;">
+                Đặt lại Mật khẩu
+            </a>
+            <p>Liên kết này sẽ hết hạn sau 1 giờ.</p>
+            <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>
+            <p>Nếu bạn không thể nhấp vào nút, sao chép và dán liên kết sau vào trình duyệt:</p>
+            <p>${resetLink}</p>
+        `,
+  };
+
+  await transporter.sendMail(mailOptions);
+}
+
+
+// Hàm xử lý yêu cầu Quên Mật khẩu (Chỉ gửi email)
+async function handleForgotPassword(email: string) {
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  // LUÔN LUÔN trả về một thông báo thành công chung chung để tránh tiết lộ liệu email có tồn tại hay không.
+  if (!user || !user.isVerified) {
+    // Vẫn trả về thành công để tránh tấn công enumeration (liệt kê)
+    return NextResponse.json(
+      { success: true, message: "If an account with that email exists, a password reset link has been sent." },
+      { status: 200 }
+    );
+  }
+
+  try {
+    // 1. TẠO RESET TOKEN (hết hạn trong 1 giờ)
+    // Token này KHÔNG cần chứa nhiều thông tin, chỉ cần id để xác định người dùng sau này.
+    const resetToken = jwt.sign(
+      { id: user.id }, 
+      JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+    
+    // **LƯU Ý QUAN TRỌNG:** Trong một ứng dụng thực tế, bạn nên mã hóa và lưu trữ `resetToken` trong DB, 
+    // và chỉ gửi token thô đã được tạo (ở đây là `resetToken`) qua email.
+    // Sau đó, khi người dùng gửi lại token, bạn đối chiếu nó với phiên bản đã lưu trữ trong DB.
+    // Tuy nhiên, vì mục đích đơn giản, chúng ta sẽ chỉ dựa vào JWT hết hạn trong 1h.
+    
+    // 2. GỬI EMAIL ĐẶT LẠI MẬT KHẨU
+    await sendResetPasswordEmail(user.email, resetToken);
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "If an account with that email exists, a password reset link has been sent.",
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error during forgot password:", error);
+    return NextResponse.json(
+      { success: false, message: "Error sending password reset email." },
+      { status: 500 }
+    );
+  }
+}
+
+
 async function handleSignup(email: string, password: string) {
   const existingUser = await prisma.user.findUnique({
     where: { email },
@@ -287,6 +363,10 @@ export async function POST(request: Request) {
         return await handleSignup(email, password);
       case "login":
         return await handleLogin(email, password);
+      case "forgot-password":
+        // Chỉ cần email
+        if (!email) throw new Error("Missing email for forgot password.");
+        return await handleForgotPassword(email);
       default:
         return NextResponse.json(
           { success: false, message: "Invalid action." },

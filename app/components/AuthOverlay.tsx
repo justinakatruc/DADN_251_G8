@@ -2,13 +2,16 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Account } from "../model";
-import { mockAccounts, mockDevices, mockUsers } from "../store/mockData";
+// import { mockAccounts, mockDevices, mockUsers } from "../store/mockData"; // Dữ liệu mock không cần thiết
 import { useUserStore } from "../store/useUserStore";
 import { toast } from "sonner";
 import { authAPI } from "@/lib/api";
 
+// Cập nhật type AuthMode
+type AuthMode = "login" | "signup" | "forgot-password";
+
 interface AuthOverlayProps {
-  initialMode?: "login" | "signup";
+  initialMode?: AuthMode; // Sử dụng AuthMode
   onClose?: () => void;
 }
 
@@ -56,13 +59,15 @@ type FormErrors = {
   [key: string]: string;
 };
 
+// Cập nhật interface AuthToggleType
 interface AuthToggleType {
-  authToggle: boolean;
-  setAuthToggle: React.Dispatch<React.SetStateAction<boolean>>;
+  setAuthMode: React.Dispatch<React.SetStateAction<AuthMode>>;
   onClose?: () => void;
 }
 
-function SignInOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
+
+// #region SignIn
+function SignInOverlay({ setAuthMode, onClose }: AuthToggleType) {
   const { setUser, setUserDevices } = useUserStore();
   const baseData: Account = { email: "", password: "" };
 
@@ -167,13 +172,14 @@ function SignInOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
               <div className="text-red-500 text-sm">{errors.password}</div>
             )}
           </div>
+          {/* Cập nhật liên kết Quên mật khẩu */}
           <div className="text-end w-full">
-            <a
-              href="./"
+            <p
+              onClick={() => setAuthMode("forgot-password")}
               className="text-[#4d4d4d] text-sm sm:text-base font-medium cursor-pointer hover:text-blue-500 ml-1 transition-colors"
             >
               Forgot your password?
-            </a>
+            </p>
           </div>
           {errors.general && (
             <div className="text-red-500 text-sm">{errors.general}</div>
@@ -181,7 +187,7 @@ function SignInOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
           <button
             type="submit"
             disabled={isLoading}
-            className="block w-full bg-[#4E7EF9] rounded-md text-center p-2 my-4 text-white text-sm sm:text-base font-medium hover:bg-blue-600 transition-colors cursor-pointer"
+            className="block w-full bg-[#4E7EF9] rounded-md text-center p-2 my-4 text-white text-sm sm:text-base font-medium hover:bg-blue-600 transition-colors cursor-pointer disabled:opacity-50"
             onClick={handleLogin}
           >
             Login
@@ -209,7 +215,7 @@ function SignInOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
             <p>Don&apos;t have an account?</p>
             <p
               onClick={() => {
-                setAuthToggle(!authToggle);
+                setAuthMode("signup");
               }}
               className="underline cursor-pointer hover:text-blue-500 ml-1 transition-colors"
             >
@@ -221,8 +227,11 @@ function SignInOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
     </AuthTemplate>
   );
 }
+// #endregion
 
-function SignUpOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
+
+// #region SignUp
+function SignUpOverlay({ setAuthMode, onClose }: AuthToggleType) {
   const baseData: Account = { email: "", password: "" };
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [formData, setFormData] = useState<Account>(baseData);
@@ -266,7 +275,7 @@ function SignUpOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
 
       if (result.success) {
         toast.success("Sign up successful! Please verify your email in your inbox.");
-        setAuthToggle(!authToggle);
+        setAuthMode("login"); // Chuyển về Login sau khi đăng ký thành công
         setIsLoading(false);
       } else {
         setIsLoading(false);
@@ -349,7 +358,7 @@ function SignUpOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
           )}
           <button
             type="submit"
-            className="block w-full bg-[#4E7EF9] rounded-md text-center p-2 my-4 text-white text-sm sm:text-base font-medium hover:bg-blue-600 transition-colors cursor-pointer"
+            className="block w-full bg-[#4E7EF9] rounded-md text-center p-2 my-4 text-white text-sm sm:text-base font-medium hover:bg-blue-600 transition-colors cursor-pointer disabled:opacity-50"
             disabled={isLoading}
             onClick={handleSignUp}
           >
@@ -378,7 +387,7 @@ function SignUpOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
             <p>Already have an account? </p>
             <p
               onClick={() => {
-                setAuthToggle(!authToggle);
+                setAuthMode("login");
               }}
               className="underline cursor-pointer hover:text-blue-500 ml-1 transition-colors"
             >
@@ -390,24 +399,155 @@ function SignUpOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
     </AuthTemplate>
   );
 }
+// #endregion
 
+
+// #region ForgotPassword
+function ForgotPasswordOverlay({ setAuthMode, onClose }: AuthToggleType) {
+  const [email, setEmail] = useState<string>("");
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    if (!email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Email is invalid";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleForgotPassword = async () => {
+    setErrors({});
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    setIsSuccess(false);
+
+    try {
+      // Gọi API yêu cầu đặt lại mật khẩu
+      const result = await authAPI.forgotPassword(email); 
+
+      if (result.success) {
+        toast.success(result.message);
+        setIsSuccess(true); // Hiển thị thông báo thành công trên UI
+      } else {
+        // API backend đã được thiết lập để luôn trả về success: true (hoặc 200) 
+        // để tránh tấn công enumeration, nhưng ta vẫn xử lý lỗi phòng trường hợp lỗi 500.
+        toast.error(result.message || "An error occurred. Please try again.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Internal Server Error. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <AuthTemplate
+      title="Forgot Password"
+      subtitle="Enter your email to receive a password reset link."
+      onClose={onClose}
+    >
+      <div className="flex flex-col w-full items-start my-2 px-2 md:px-0">
+        {isSuccess ? (
+          <div className="w-full p-4 my-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
+            <p className="font-medium">
+              Check your email! A password reset link has been sent.
+            </p>
+            <button
+              onClick={() => setAuthMode("login")}
+              className="mt-2 text-sm text-green-700 underline hover:text-green-900"
+            >
+              Back to Login
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="w-full flex flex-col gap-y-1 my-2">
+              <label className="text-[#262626] text-sm sm:text-base font-medium">
+                Email
+              </label>
+              <div className="w-full bg-gray-100 border-xl border-gray-400 rounded-md my-2">
+                <input
+                  className="w-full p-2 sm:p-4 placeholder:text-[#666666] bg-transparent border-none outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  type="email"
+                  placeholder="Enter your Email"
+                />
+              </div>
+              {errors.email && (
+                <div className="text-red-500 text-sm">{errors.email}</div>
+              )}
+            </div>
+            
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="block w-full bg-[#4E7EF9] rounded-md text-center p-2 my-4 text-white text-sm sm:text-base font-medium hover:bg-blue-600 transition-colors cursor-pointer disabled:opacity-50"
+              onClick={handleForgotPassword}
+            >
+              {isLoading ? "Sending..." : "Send Reset Link"}
+            </button>
+            
+            <div className="flex flex-row justify-center w-full mt-2 text-[#262626] text-sm sm:text-base font-medium">
+              <p
+                onClick={() => setAuthMode("login")}
+                className="underline cursor-pointer hover:text-blue-500 transition-colors"
+              >
+                Back to Login
+              </p>
+            </div>
+          </>
+        )}
+      </div>
+    </AuthTemplate>
+  );
+}
+// #endregion
+
+
+// #region AuthOverlay
 export default function AuthOverlay({
   initialMode = "login",
   onClose,
 }: AuthOverlayProps) {
-  const [authToggle, setAuthToggle] = useState(initialMode == "login");
+  // Thay đổi `authToggle` boolean thành `authMode` string
+  const [authMode, setAuthMode] = useState<AuthMode>(initialMode);
 
-  return authToggle ? (
-    <SignInOverlay
-      authToggle={authToggle}
-      setAuthToggle={setAuthToggle}
-      onClose={onClose}
-    />
-  ) : (
-    <SignUpOverlay
-      authToggle={authToggle}
-      setAuthToggle={setAuthToggle}
-      onClose={onClose}
-    />
-  );
+  // Render component tương ứng dựa trên `authMode`
+  switch (authMode) {
+    case "login":
+      return (
+        <SignInOverlay
+          setAuthMode={setAuthMode}
+          onClose={onClose}
+        />
+      );
+    case "signup":
+      return (
+        <SignUpOverlay
+          setAuthMode={setAuthMode}
+          onClose={onClose}
+        />
+      );
+    case "forgot-password": // <-- Xử lý chế độ mới
+      return (
+        <ForgotPasswordOverlay
+          setAuthMode={setAuthMode}
+          onClose={onClose}
+        />
+      );
+    default:
+      return null;
+  }
 }
+// #endregion
