@@ -81,7 +81,9 @@ export default function ProfilePage() {
             width={225}
             height={225}
           />
-          <p className="mt-4 text-gray-500">Please log in to view your profile.</p>
+          <p className="mt-4 text-gray-500">
+            Please log in to view your profile.
+          </p>
         </div>
       ) : (
         <div className="mt-6 space-y-8">
@@ -165,7 +167,7 @@ export default function ProfilePage() {
                 className={`w-40 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
                   isLoading
                     ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-[#4C6FFF] hover:opacity-90"
+                    : "bg-[#4C6FFF] hover:opacity-90 cursor-pointer"
                 } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
               >
                 {isLoading ? "Changing..." : "Change Password"}

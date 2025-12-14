@@ -222,7 +222,7 @@ export default function Weather() {
         alt="Weather icon"
         width={128}
         height={128}
-        className="self-center md:self-end"
+        className="self-center md:self-end select-none lg:-mt-2"
       />
     </div>
   );

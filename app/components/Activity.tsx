@@ -17,7 +17,6 @@ type ActivityProps = {
 };
 
 export default function Activity({ data }: ActivityProps) {
-  console.log("ac", data);
   const { user } = useUserStore();
   const [selectedSensor, setSelectedSensor] = useState("Temperature");
   const [selectedTime, setSelectedTime] = useState<string>("Month");

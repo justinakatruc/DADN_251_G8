@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">
+      <body className="antialiased md:overflow-hidden">
         <AppLayout>{children}</AppLayout>
         <Toaster position="top-right" richColors />
       </body>

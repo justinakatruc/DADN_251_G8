@@ -29,6 +29,7 @@ async function handleAddUser(userData: {
         email: userData.email,
         role: userData.role,
         password: hashedPassword,
+        isVerified: true,
       },
     });
     return NextResponse.json({ success: true, user: newUser }, { status: 201 });

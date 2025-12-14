@@ -26,16 +26,16 @@ function AuthTemplate({
   onClose,
 }: AuthTemplateProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center caret-transparent select-none">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
         onClick={onClose}
-        className="absolute inset-0 bg-black/50 backdrop-blur-[2px] items-center"
+        className="absolute inset-0 bg-black/50 backdrop-blur-[2px] items-center select-none caret-transparent"
       />
       <div className="relative flex flex-col w-full max-w-sm sm:max-w-md bg-white rounded-2xl items-start justify-center mx-2 px-2 py-6 sm:p-6">
         {onClose && (
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl font-bold cursor-pointer"
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl font-bold cursor-pointer caret-transparent select-none"
           >
             ✕
           </button>
@@ -186,7 +186,7 @@ function SignInOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
           >
             Login
           </button>
-          <div className="flex items-center w-full my-2 sm:my-4 caret-transparent">
+          <div className="flex items-center w-full my-2 sm:my-4">
             <div className="flex-grow border-t border-gray-300"></div>
             <span className="mx-2 sm:mx-3 text-[#666666] text-sm sm:text-base font-medium">
               OR
@@ -265,7 +265,9 @@ function SignUpOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
       });
 
       if (result.success) {
-        toast.success("Sign up successful! Please verify your email in your inbox.");
+        toast.success(
+          "Sign up successful! Please verify your email in your inbox."
+        );
         setAuthToggle(!authToggle);
         setIsLoading(false);
       } else {
@@ -355,7 +357,7 @@ function SignUpOverlay({ authToggle, setAuthToggle, onClose }: AuthToggleType) {
           >
             Sign Up
           </button>
-          <div className="flex items-center w-full my-2 sm:my-4 caret-transparent">
+          <div className="flex items-center w-full my-2 sm:my-4">
             <div className="flex-grow border-t border-gray-300"></div>
             <span className="mx-2 sm:mx-3 text-[#666666] text-sm sm:text-base font-medium">
               OR

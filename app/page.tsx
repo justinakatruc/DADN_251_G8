@@ -12,6 +12,11 @@ import { Row, HistoryDataItem } from "./model";
 import { useDevicesStore } from "./store/useDevicesStore";
 import { userAPI } from "@/lib/api";
 
+type SensorData = {
+  value: number | string;
+  time: string | undefined;
+};
+
 export default function Home() {
   const { user } = useUserStore();
   const { devices } = useDevicesStore();
@@ -24,12 +29,16 @@ export default function Home() {
   const [deviceFilter, setDeviceFilter] = useState<string>(deviceList[0]);
 
   const [latestData, setLatestData] = useState<Row[]>([]);
-  const [updatedTemperature, setUpdatedTemperature] = useState<number | string>(
-    "-"
-  );
-  const [updatedHumidity, setUpdatedHumidity] = useState<number | string>("-");
-  const [updatedLight, setUpdatedLight] = useState<number | string>("-");
-  const [updatedPir, setUpdatedPir] = useState<number | string>("-");
+
+  const blankData: SensorData = {
+    value: "-",
+    time: undefined,
+  };
+  const [updatedTemperature, setUpdatedTemperature] =
+    useState<SensorData>(blankData);
+  const [updatedHumidity, setUpdatedHumidity] = useState<SensorData>(blankData);
+  const [updatedLight, setUpdatedLight] = useState<SensorData>(blankData);
+  // const [updatedPir, setUpdatedPir] = useState<number | string>("-");
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchHistoryData = useCallback(async () => {
@@ -51,19 +60,31 @@ export default function Home() {
 
         setUpdatedTemperature(
           historyTemperatureData.length > 0
-            ? historyTemperatureData[0].value
-            : "-"
+            ? {
+                value: historyTemperatureData[0].value,
+                time: historyTemperatureData[0].timestamp_local,
+              }
+            : blankData
         );
         setUpdatedHumidity(
-          historyHumidityData.length > 0 ? historyHumidityData[0].value : "-"
+          historyHumidityData.length > 0
+            ? {
+                value: historyHumidityData[0].value,
+                time: historyHumidityData[0].timestamp_local,
+              }
+            : blankData
         );
         setUpdatedLight(
-          historyLightData.length > 0 ? historyLightData[0].value : "-"
+          historyLightData.length > 0
+            ? {
+                value: historyLightData[0].value,
+                time: historyLightData[0].timestamp_local,
+              }
+            : blankData
         );
 
         const combinedHistoryData: Row[] = [];
 
-        // Append temperature data
         historyTemperatureData.forEach((data: HistoryDataItem) => {
           combinedHistoryData.push({
             id: data.id,
@@ -75,7 +96,6 @@ export default function Home() {
           });
         });
 
-        // Append humidity data
         historyHumidityData.forEach((data: HistoryDataItem) => {
           combinedHistoryData.push({
             id: data.id,
@@ -87,7 +107,6 @@ export default function Home() {
           });
         });
 
-        // Append light data
         historyLightData.forEach((data: HistoryDataItem) => {
           combinedHistoryData.push({
             id: data.id,
@@ -115,26 +134,41 @@ export default function Home() {
 
   const sensorValues = {
     temperatureC: user
-      ? updatedTemperature !== "-"
-        ? updatedTemperature + " °C"
+      ? updatedTemperature.value !== "-"
+        ? updatedTemperature.value + " °C"
         : "-"
       : "-",
     temperatureF: user
-      ? updatedTemperature !== "-"
-        ? `${((Number(updatedTemperature) * 9) / 5 + 32).toFixed(1)} °F`
+      ? updatedTemperature.value !== "-"
+        ? `${((Number(updatedTemperature.value) * 9) / 5 + 32).toFixed(1)} °F`
         : "-"
       : "-",
+    temperatureTime: user
+      ? updatedTemperature.time !== undefined
+        ? new Date(updatedTemperature.time)
+        : undefined
+      : undefined,
     humidity: user
-      ? updatedHumidity !== "-"
-        ? updatedHumidity + "%"
+      ? updatedHumidity.value !== "-"
+        ? updatedHumidity.value + "%"
         : "-"
       : "-",
+    humidityTime: user
+      ? updatedHumidity.time !== undefined
+        ? new Date(updatedHumidity.time)
+        : undefined
+      : undefined,
     lightIntensity: user
-      ? updatedLight !== "-"
-        ? updatedLight + " lux"
+      ? updatedLight.value !== "-"
+        ? updatedLight.value + " lux"
         : "-"
       : "-",
-    pir: user ? (updatedPir !== "-" ? updatedPir : "-") : "-",
+    lightTime: user
+      ? updatedLight.time !== undefined
+        ? new Date(updatedLight.time)
+        : undefined
+      : undefined,
+    // pir: user ? (updatedPir !== "-" ? updatedPir : "-") : "-",
     handleRefresh: fetchHistoryData,
   };
 
@@ -176,7 +210,7 @@ export default function Home() {
       <div className="p-8 w-full">
         <div className="w-full flex items-center justify-between pb-5 border-b border-[rgba(0,0,0,0.1)]">
           <h1 className="text-2xl font-bold">Reports</h1>
-          <div className="flex gap-x-2.5 items-center">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-100 cursor-pointer">
             <Image
               src="/icons/download.png"
               alt="Download Icon"

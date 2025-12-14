@@ -15,27 +15,41 @@ function Bar({ state }: { state: boolean }) {
   );
 }
 
+function GetStatus(sensorTime: Date | undefined) {
+  const maxOffset = 5 * 60 * 1000;
+  // const currTime = new Date("2025-12-12T01:45:00.000+00:00").getTime();
+  // 1 min 39 sec after the most recent lux sensor time (if you want to test)
+  const currTime = new Date().getTime();
+  const dataTime = sensorTime?.getTime();
+  if (dataTime && currTime) {
+    return currTime - dataTime < maxOffset ? true : false;
+  }
+  return false;
+}
+
 type StatusProps = {
   sensorvalues: {
     temperatureC: string | number;
     temperatureF: string | number;
+    temperatureTime: Date | undefined;
     humidity: string | number;
+    humidityTime: Date | undefined;
     lightIntensity: string | number;
-    pir: string | number;
+    lightTime: Date | undefined;
+    // pir: string | number;
   };
 };
 
 export default function Status({ sensorvalues }: StatusProps) {
   const statuses = {
-    temperature: sensorvalues.temperatureC !== "-",
-    humidity: sensorvalues.humidity !== "-",
-    light: sensorvalues.lightIntensity !== "-",
-    pir: sensorvalues.pir !== "-",
+    temperature: GetStatus(sensorvalues.temperatureTime),
+    humidity: GetStatus(sensorvalues.humidityTime),
+    light: GetStatus(sensorvalues.lightTime),
   };
 
   return (
     <div className="lg:mt-[30px] w-full flex flex-col gap-y-[30px]">
-      <div className="w-full p-2 bg-white rounded-[19px] shadow-md border">
+      <div className="w-full p-2 bg-white rounded-[19px] shadow-md border lg:space-y-6 lg:py-4">
         <h2 className="mx-4 my-1 font-bold">Current Status</h2>
         <div className="flex flex-row w-full font-semibold p-2">
           <Image
@@ -71,7 +85,7 @@ export default function Status({ sensorvalues }: StatusProps) {
           </div>
         </div>
       </div>
-      <div className="w-full p-2 bg-white rounded-[19px] shadow-md border">
+      {/* <div className="w-full p-2 bg-white rounded-[19px] shadow-md border">
         <h2 className="mx-4 my-1 font-bold">Current Status</h2>
         <div className="flex flex-row w-full font-semibold p-2">
           <Activity className="m-2" size={24} />
@@ -87,7 +101,7 @@ export default function Status({ sensorvalues }: StatusProps) {
             <Bar state={false} />
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
