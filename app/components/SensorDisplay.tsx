@@ -25,6 +25,7 @@ export default function SensorDisplay({ sensorvalues }: SensorDisplayProps) {
               alt="Refresh Icon"
               width={19}
               height={19}
+              className="select-none"
             />
           </div>
         </div>

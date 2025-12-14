@@ -57,7 +57,7 @@ export default function Status({ sensorvalues }: StatusProps) {
             alt="Temperature Icon"
             width={24}
             height={24}
-            className="m-2"
+            className="m-2 select-none"
           />
           <div className="w-full">
             <span>Temperature Sensor</span>
@@ -70,7 +70,7 @@ export default function Status({ sensorvalues }: StatusProps) {
             alt="Temperature Icon"
             width={24}
             height={24}
-            className="m-2"
+            className="m-2 select-none"
           />
           <div className="w-full">
             <span>Humidity Sensor</span>

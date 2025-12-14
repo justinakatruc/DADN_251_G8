@@ -65,7 +65,7 @@ export default function ProfilePage() {
   return (
     <div className="p-8 w-full">
       {/* Header */}
-      <div className="w-full flex items-center justify-between pb-5 border-b border-black/10">
+      <div className="w-full flex items-center justify-between pb-6 border-b border-black/10">
         <h1 className="text-2xl font-bold">Profile Settings</h1>
         {/* Có thể thêm nút chỉnh sửa profile ở đây nếu cần */}
       </div>

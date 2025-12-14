@@ -178,6 +178,7 @@ export default function HistoryPage() {
       <div className="w-full flex items-center justify-between pb-5 border-b border-black/10">
         <h1 className="text-2xl font-bold">History</h1>
         <button
+          disabled={isLoading || data.length === 0}
           onClick={handleDownloadCSV}
           className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-100 cursor-pointer"
         >
@@ -244,13 +245,16 @@ export default function HistoryPage() {
           </div>
 
           {!user && (
-            <div className="w-full h-[500px] flex items-center justify-center">
+            <div className="w-full h-[500px] flex flex-col items-center justify-center">
               <Image
                 src="/icons/yolohome.png"
                 alt="Yolo Home"
                 width={225}
                 height={225}
               />
+              <p className="mt-4 text-gray-500">
+                Please log in to view your history.
+              </p>
             </div>
           )}
 

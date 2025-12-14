@@ -58,27 +58,42 @@ export default function Home() {
           historyLightData,
         } = response;
 
+        const sortedTemperatureData = historyTemperatureData.sort(
+          (a: HistoryDataItem, b: HistoryDataItem) =>
+            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+
+        const sortedHumidityData = historyHumidityData.sort(
+          (a: HistoryDataItem, b: HistoryDataItem) =>
+            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+
+        const sortedLightData = historyLightData.sort(
+          (a: HistoryDataItem, b: HistoryDataItem) =>
+            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+
         setUpdatedTemperature(
-          historyTemperatureData.length > 0
+          sortedTemperatureData.length > 0
             ? {
-                value: historyTemperatureData[0].value,
-                time: historyTemperatureData[0].timestamp_local,
+                value: sortedTemperatureData[0].value,
+                time: sortedTemperatureData[0].timestamp_local,
               }
             : blankData
         );
         setUpdatedHumidity(
-          historyHumidityData.length > 0
+          sortedHumidityData.length > 0
             ? {
-                value: historyHumidityData[0].value,
-                time: historyHumidityData[0].timestamp_local,
+                value: sortedHumidityData[0].value,
+                time: sortedHumidityData[0].timestamp_local,
               }
             : blankData
         );
         setUpdatedLight(
-          historyLightData.length > 0
+          sortedLightData.length > 0
             ? {
-                value: historyLightData[0].value,
-                time: historyLightData[0].timestamp_local,
+                value: sortedLightData[0].value,
+                time: sortedLightData[0].timestamp_local,
               }
             : blankData
         );
@@ -210,20 +225,21 @@ export default function Home() {
       <div className="p-8 w-full">
         <div className="w-full flex items-center justify-between pb-5 border-b border-[rgba(0,0,0,0.1)]">
           <h1 className="text-2xl font-bold">Reports</h1>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-100 cursor-pointer">
+          <button
+            disabled={isLoading || latestData.length === 0}
+            onClick={handleDownloadCSV}
+            className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-100 cursor-pointer"
+          >
             <Image
               src="/icons/download.png"
-              alt="Download Icon"
-              width={24}
-              height={24}
+              alt="Download"
+              width={20}
+              height={20}
             />
-            <div
-              onClick={handleDownloadCSV}
-              className="font-semibold text-[#4D4D4D] text-[13px]"
-            >
-              Downloads
-            </div>
-          </div>
+            <span className="font-semibold text-[#4D4D4D] text-[13px]">
+              Download
+            </span>
+          </button>
         </div>
         <TopBar
           deviceItems={deviceList}
